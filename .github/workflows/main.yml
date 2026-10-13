@@ -32,17 +32,17 @@ jobs:
         with:
           gradle-version: '8.7'
       - name: Restore signing key
-        env:
-          KEYSTORE_BASE64: ${{ secrets.OVERBOOKED_KEYSTORE_BASE64 }}
+        env:          
+           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           test -n "$KEYSTORE_BASE64"
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/overbooked-release.jks"
       - name: Build signed APK
         env:
           SIGNING_STORE_FILE: ${{ runner.temp }}/overbooked-release.jks
-          SIGNING_STORE_PASSWORD: ${{ secrets.OVERBOOKED_STORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.OVERBOOKED_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.OVERBOOKED_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: gradle :app:assembleRelease --no-daemon
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
