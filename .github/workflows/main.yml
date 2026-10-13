@@ -44,6 +44,21 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: gradle :app:assembleRelease --no-daemon
+      - name: Sign APK
+        env:
+         SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+         SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+         APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+         test -n "$APKSIGNER"
+         "$APKSIGNER" sign \
+          --ks "${{ runner.temp }}/overbooked-release.jks" \
+          --ks-key-alias overbooked \
+          --ks-pass env:SIGNING_STORE_PASSWORD \
+          --key-pass env:SIGNING_KEY_PASSWORD \
+          --out app/build/outputs/apk/release/Overbooked.apk \
+          app/build/outputs/apk/release/app-release-unsigned.apk
+         "$APKSIGNER" verify app/build/outputs/apk/release/Overbooked.apk
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
