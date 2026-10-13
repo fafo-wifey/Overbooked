@@ -39,6 +39,9 @@ jobs:
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/overbooked-release.jks"
       - name: Build signed APK
         run: gradle :app:assembleRelease --no-daemon
+      - name: Find generated APK
+        run: |
+          find app/build/outputs/apk -type f -name "*.apk"
         env:
           SIGNING_STORE_FILE: ${{ runner.temp }}/overbooked-release.jks
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
